@@ -97,8 +97,21 @@ def reward_accuracy(reward_chosen, reward_rejected):
     # TODO: Fraction of pairs where chosen reward is strictly higher than rejected.
     return (reward_chosen > reward_rejected).mean()
 
-# Step 11 - build_preference_pairs (not yet solved)
-# TODO: implement
+# Step 11 - build_preference_pairs
+def build_preference_pairs(prompts, chosen_ids, rejected_ids, chosen_mask, rejected_mask):
+    # TODO: Package raw arrays into a list of preference-pair dictionaries
+    pairs = []
+    for i in range(len(prompts)):
+        pair = {}
+        pair['prompt'] = prompts[i]
+        pair['chosen_ids'] = chosen_ids[i]
+        pair['rejected_ids'] = rejected_ids[i]
+        pair['chosen_mask'] = chosen_mask[i]
+        pair['rejected_mask'] = rejected_mask[i]
+
+        pairs.append(pair)
+
+    return pairs
 
 # Step 12 - sample_preference_batch (not yet solved)
 # TODO: implement
