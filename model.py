@@ -25,8 +25,10 @@ def gather_token_logprobs(log_probs, token_ids):
     # TODO: Extract the log-probability of each observed token from a full vocab log-prob tensor...
     return log_probs[np.arange(token_ids.shape[0])[:,None], np.arange(token_ids.shape[1])[None,:], token_ids]
 
-# Step 4 - masked_sequence_logprob (not yet solved)
-# TODO: implement
+# Step 4 - masked_sequence_logprob
+def masked_sequence_logprob(token_logprobs, mask):
+    # TODO: Sum per-token log-probabilities under a binary mask to obtain a single sequence log-probability per example.
+    return (token_logprobs * mask).sum(axis=-1)
 
 # Step 5 - init_policy_params (not yet solved)
 # TODO: implement
