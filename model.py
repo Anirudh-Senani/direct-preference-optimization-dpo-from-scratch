@@ -92,8 +92,10 @@ def bradley_terry_loss(reward_chosen, reward_rejected):
 
     return (-log_sigmoid).mean()
 
-# Step 10 - reward_accuracy (not yet solved)
-# TODO: implement
+# Step 10 - reward_accuracy
+def reward_accuracy(reward_chosen, reward_rejected):
+    # TODO: Fraction of pairs where chosen reward is strictly higher than rejected.
+    return (reward_chosen > reward_rejected).mean()
 
 # Step 11 - build_preference_pairs (not yet solved)
 # TODO: implement
