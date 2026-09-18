@@ -103,7 +103,7 @@ def build_preference_pairs(prompts, chosen_ids, rejected_ids, chosen_mask, rejec
     pairs = []
     for i in range(len(prompts)):
         pair = {}
-        pair['prompt'] = prompts[i]
+        pair['prompt'] = np.array(prompts[i])
         pair['chosen_ids'] = chosen_ids[i]
         pair['rejected_ids'] = rejected_ids[i]
         pair['chosen_mask'] = chosen_mask[i]
