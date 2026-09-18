@@ -84,8 +84,13 @@ def sequence_logprob_grad(params, token_ids, mask):
         b_out=db
     )
 
-# Step 9 - bradley_terry_loss (not yet solved)
-# TODO: implement
+# Step 9 - bradley_terry_loss
+def bradley_terry_loss(reward_chosen, reward_rejected):
+    # TODO: Compute the mean Bradley-Terry pairwise preference loss...
+    reward_margin = reward_chosen - reward_rejected
+    log_sigmoid = np.log(1/(1+np.exp(-reward_margin)))
+
+    return (-log_sigmoid).mean()
 
 # Step 10 - reward_accuracy (not yet solved)
 # TODO: implement
