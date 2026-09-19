@@ -291,8 +291,8 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
         ref_logprob_chosen = ref_logprob['chosen']
         ref_logprob_rejected = ref_logprob['rejected']
 
-        policy_logprob_chosen = np.array(policy_sequence_logprob(params, pair['chosen_ids'], pair['chosen_mask']))
-        policy_logprob_rejected = np.array(policy_sequence_logprob(params, pair['rejected_ids'], pair['rejected_mask']))
+        policy_logprob_chosen = np.array(policy_sequence_logprob(params, pair['chosen_ids'][None,:], pair['chosen_mask']))
+        policy_logprob_rejected = np.array(policy_sequence_logprob(params, pair['rejected_ids'][None,:], pair['rejected_mask']))
 
         loss.append(dpo_loss(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
         pref_acc.append(preference_accuracy(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
@@ -312,6 +312,19 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
         frac_positive=float(np.array(frac_positive).mean())
     )
 
-# Step 27 - run_dpo_pipeline (not yet solved)
-# TODO: implement
+# Step 27 - run_dpo_pipeline
+def run_dpo_pipeline(vocab_size, d_model, prompts, chosen_ids, rejected_ids, chosen_mask, rejected_mask, beta, learning_rate, num_steps, batch_size, rng=None):
+    # TODO: Wire the full DPO pipeline end-to-end from raw arrays to eval...
+    params = init_policy_params(vocab_size, d_model, rng)
+    pairs = build_preference_pairs(prompts, chosen_ids, rejected_ids, chosen_mask, rejected_mask)
+
+    ref_logprobs = freeze_reference_logprobs(params, pairs)
+    new_params, history = train_dpo(params, pairs, ref_logprobs, beta, learning_rate, num_steps, batch_size, rng)
+    eval_metrics = evaluate_dpo(new_params, pairs, ref_logprobs, beta)
+
+    return dict(
+        params=new_params,
+        history=history,
+        eval_metrics=eval_metrics
+    )
 
