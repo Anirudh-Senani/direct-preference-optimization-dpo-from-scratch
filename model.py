@@ -291,14 +291,14 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
         ref_logprob_chosen = ref_logprob['chosen']
         ref_logprob_rejected = ref_logprob['rejected']
 
-        policy_logprob_chosen = policy_sequence_logprob(params, pair['chosen_ids'], pair['chosen_mask'])
-        policy_logprob_rejected = policy_sequence_logprob(params, pair['rejected_ids'], pair['rejected_mask'])
+        policy_logprob_chosen = np.array(policy_sequence_logprob(params, pair['chosen_ids'], pair['chosen_mask']))
+        policy_logprob_rejected = np.array(policy_sequence_logprob(params, pair['rejected_ids'], pair['rejected_mask']))
 
         loss.append(dpo_loss(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
         pref_acc.append(preference_accuracy(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
-        kl.append(kl_to_reference(policy_logprob_chosen, ref_logprob_chosen))
+        kl.append(kl_to_reference(np.array([policy_logprob_chosen, policy_logprob_rejected]), np.array([ref_logprob_chosen, ref_logprob_rejected])))
 
-        metrics = reward_margin_stats(policy_logprobs_chosen, policy_logprobs_rejected, ref_logprobs_chosen, ref_logprobs_rejected, beta)
+        metrics = reward_margin_stats(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta)
         mean_margin.append(metrics['mean_margin'])
         std_margin.append(metrics['std_margin'])
         frac_positive.append(metrics['frac_positive'])
@@ -308,7 +308,7 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
         preference_accuracy=float(np.array(pref_acc).mean()),
         kl_to_reference=float(np.array(kl).mean()),
         mean_margin=float(np.array(mean_margin).mean()),
-        std_margin=float(np.array(std_margin).mean()),
+        std_margin=float(np.array(mean_margin).std()),
         frac_positive=float(np.array(frac_positive).mean())
     )
 
