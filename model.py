@@ -171,8 +171,28 @@ def dpo_loss(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen,
     margin = dpo_pair_margin(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta)
     return (-np.log(1/(1 + np.exp(-margin)))).mean()
 
-# Step 17 - dpo_loss_grad (not yet solved)
-# TODO: implement
+# Step 17 - dpo_loss_grad
+def dpo_loss_grad(params, batch, ref_logprobs_batch, beta):
+    # TODO: Evaluate DPO loss and return parameter gradients for the policy
+    policy_logprobs_chosen = policy_sequence_logprob(params, batch['chosen_ids'], batch['chosen_mask'])
+    policy_logprobs_rejected = policy_sequence_logprob(params, batch['rejected_ids'], batch['rejected_mask'])
+
+    margin = dpo_pair_margin(policy_logprobs_chosen, policy_logprobs_rejected, ref_logprobs_batch['chosen'], ref_logprobs_batch['rejected'], beta)
+    loss = np.logaddexp(0.0, -margin).mean()
+
+    w = -(1/(1+np.exp(margin)))*beta/batch['chosen_ids'].shape[0]
+    grads = {}
+    for key in params:
+        grads[key] = np.zeros_like(params[key])
+
+    for i in range(batch['chosen_ids'].shape[0]):
+        chosen_grads = sequence_logprob_grad(params, batch['chosen_ids'][i:i+1], batch['chosen_mask'][i:i+1])
+        rejected_grads = sequence_logprob_grad(params, batch['rejected_ids'][i:i+1], batch['rejected_mask'][i:i+1])
+
+        for key in grads:
+            grads[key] += w[i] * (chosen_grads[key] - rejected_grads[key])
+
+    return float(loss), grads
 
 # Step 18 - dpo_train_step (not yet solved)
 # TODO: implement
