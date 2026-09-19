@@ -250,8 +250,13 @@ def implicit_reward(policy_logprob, reference_logprob, beta):
     # TODO: return the vector of DPO implicit rewards for a batch of sequences
     return beta * (policy_logprob - reference_logprob)
 
-# Step 23 - preference_accuracy (not yet solved)
-# TODO: implement
+# Step 23 - preference_accuracy
+def preference_accuracy(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta):
+    # TODO: fraction of pairs where chosen has higher implicit DPO reward
+    chosen_reward = implicit_reward(policy_logprob_chosen, ref_logprob_chosen, beta)
+    rejected_reward = implicit_reward(policy_logprob_rejected, ref_logprob_rejected, beta)
+
+    return (chosen_reward > rejected_reward).mean()
 
 # Step 24 - kl_to_reference (not yet solved)
 # TODO: implement
