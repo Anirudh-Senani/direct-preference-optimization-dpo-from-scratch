@@ -237,8 +237,13 @@ def length_normalized_logprob(seq_logprob, mask):
     # TODO: Normalize sequence log-probabilities by their valid token counts.
     return seq_logprob/mask.sum(axis=-1)
 
-# Step 21 - ipo_loss (not yet solved)
-# TODO: implement
+# Step 21 - ipo_loss
+def ipo_loss(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta):
+    # TODO: Evaluate mean squared IPO loss on unscaled log-ratio margins
+    margin = dpo_pair_margin(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, 1.0)
+    target = 1/(2 * beta)
+
+    return float(((margin - target)**2).mean())
 
 # Step 22 - implicit_reward (not yet solved)
 # TODO: implement
