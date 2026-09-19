@@ -211,8 +211,26 @@ def dpo_train_step(params, batch, ref_logprobs_batch, beta, learning_rate):
 
     return new_params, metrics
 
-# Step 19 - train_dpo (not yet solved)
-# TODO: implement
+# Step 19 - train_dpo
+def train_dpo(params, pairs, ref_logprobs, beta, learning_rate, num_steps, batch_size, rng=None):
+    # TODO: Sample batches, run DPO train steps, record per-step metrics.
+    # if rng is None:
+    #     rng = np.random.default_rng()
+    history = []
+
+    for step in range(num_steps):
+        batch = sample_preference_batch(pairs, batch_size, rng)
+        ref_logprobs_batch = dict(
+            chosen=ref_logprobs['chosen'][batch['inds']],
+            rejected=ref_logprobs['rejected'][batch['inds']]
+        )
+
+        params, metrics = dpo_train_step(params, batch, ref_logprobs_batch, beta, learning_rate)
+        metrics['step'] = step
+
+        history.append(metrics)
+
+    return params, history
 
 # Step 20 - length_normalized_logprob (not yet solved)
 # TODO: implement
