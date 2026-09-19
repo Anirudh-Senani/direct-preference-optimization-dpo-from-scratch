@@ -284,7 +284,7 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
     pref_acc = []
     kl = []
     mean_margin = []
-    std_margin = []
+    # std_margin = []
     frac_positive = []
 
     for pair, ref_logprob in zip(pairs, ref_logprobs):
@@ -300,7 +300,7 @@ def evaluate_dpo(params, pairs, ref_logprobs, beta):
 
         metrics = reward_margin_stats(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta)
         mean_margin.append(metrics['mean_margin'])
-        std_margin.append(metrics['std_margin'])
+        # std_margin.append(metrics['std_margin'])
         frac_positive.append(metrics['frac_positive'])
 
     return dict(
