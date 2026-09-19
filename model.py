@@ -319,7 +319,10 @@ def run_dpo_pipeline(vocab_size, d_model, prompts, chosen_ids, rejected_ids, cho
     pairs = build_preference_pairs(prompts, chosen_ids, rejected_ids, chosen_mask, rejected_mask)
 
     ref_logprobs = freeze_reference_logprobs(params, pairs)
-    new_params, history = train_dpo(params, pairs, ref_logprobs, beta, learning_rate, num_steps, batch_size, rng)
+    ref_logprobs_stacked = {}
+    ref_logprobs_stacked['chosen'] = np.stack([rlp['chosen'] for rlp in ref_logprobs])
+    ref_logprobs_stacked['rejected'] = np.stack([rlp['rejected'] for rlp in ref_logprobs])
+    new_params, history = train_dpo(params, pairs, ref_logprobs_stacked, beta, learning_rate, num_steps, batch_size, rng)
     eval_metrics = evaluate_dpo(new_params, pairs, ref_logprobs, beta)
 
     return dict(
