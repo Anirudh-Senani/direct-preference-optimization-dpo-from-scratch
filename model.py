@@ -263,8 +263,19 @@ def kl_to_reference(policy_logprob, reference_logprob):
     # TODO: Estimate the mean KL divergence of the policy from the reference...
     return (policy_logprob - reference_logprob).mean()
 
-# Step 25 - reward_margin_stats (not yet solved)
-# TODO: implement
+# Step 25 - reward_margin_stats
+def reward_margin_stats(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta):
+    # TODO: Summarize implicit-reward margins with mean, std, and frac positive.
+    chosen_reward = implicit_reward(policy_logprob_chosen, ref_logprob_chosen, beta)
+    rejected_reward = implicit_reward(policy_logprob_rejected, ref_logprob_rejected, beta)
+
+    margins = chosen_reward - rejected_reward
+
+    return dict(
+        mean_margin=margins.mean(),
+        std_margin=margins.std(),
+        frac_positive=(margins>0.0).mean()
+    )
 
 # Step 26 - evaluate_dpo (not yet solved)
 # TODO: implement
