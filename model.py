@@ -256,7 +256,7 @@ def preference_accuracy(policy_logprob_chosen, policy_logprob_rejected, ref_logp
     chosen_reward = implicit_reward(policy_logprob_chosen, ref_logprob_chosen, beta)
     rejected_reward = implicit_reward(policy_logprob_rejected, ref_logprob_rejected, beta)
 
-    return (chosen_reward > rejected_reward).mean()
+    return (chosen_reward > rejected_reward).astype(int).mean()
 
 # Step 24 - kl_to_reference
 def kl_to_reference(policy_logprob, reference_logprob):
@@ -277,8 +277,40 @@ def reward_margin_stats(policy_logprob_chosen, policy_logprob_rejected, ref_logp
         frac_positive=(margins>0.0).mean()
     )
 
-# Step 26 - evaluate_dpo (not yet solved)
-# TODO: implement
+# Step 26 - evaluate_dpo
+def evaluate_dpo(params, pairs, ref_logprobs, beta):
+    # TODO: Aggregate a full set of DPO evaluation metrics over a preference dataset.
+    loss = []
+    pref_acc = []
+    kl = []
+    mean_margin = []
+    std_margin = []
+    frac_positive = []
+
+    for pair, ref_logprob in zip(pairs, ref_logprobs):
+        ref_logprob_chosen = ref_logprob['chosen']
+        ref_logprob_rejected = ref_logprob['rejected']
+
+        policy_logprob_chosen = policy_sequence_logprob(params, pair['chosen_ids'], pair['chosen_mask'])
+        policy_logprob_rejected = policy_sequence_logprob(params, pair['rejected_ids'], pair['rejected_mask'])
+
+        loss.append(dpo_loss(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
+        pref_acc.append(preference_accuracy(policy_logprob_chosen, policy_logprob_rejected, ref_logprob_chosen, ref_logprob_rejected, beta))
+        kl.append(kl_to_reference(policy_logprob_chosen, ref_logprob_chosen))
+
+        metrics = reward_margin_stats(policy_logprobs_chosen, policy_logprobs_rejected, ref_logprobs_chosen, ref_logprobs_rejected, beta)
+        mean_margin.append(metrics['mean_margin'])
+        std_margin.append(metrics['std_margin'])
+        frac_positive.append(metrics['frac_positive'])
+
+    return dict(
+        dpo_loss=float(np.array(loss).mean()),
+        preference_accuracy=float(np.array(pref_acc).mean()),
+        kl_to_reference=float(np.array(kl).mean()),
+        mean_margin=float(np.array(mean_margin).mean()),
+        std_margin=float(np.array(std_margin).mean()),
+        frac_positive=float(np.array(frac_positive).mean())
+    )
 
 # Step 27 - run_dpo_pipeline (not yet solved)
 # TODO: implement
