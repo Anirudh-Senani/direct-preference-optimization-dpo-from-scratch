@@ -137,6 +137,8 @@ def sample_preference_batch(pairs, batch_size, rng=None):
     for key in batch:
         batch[key] = np.stack(batch[key])
 
+    batch['inds'] = inds
+
     return batch
 
 # Step 13 - freeze_reference_logprobs
